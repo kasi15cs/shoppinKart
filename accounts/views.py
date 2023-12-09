@@ -1,6 +1,9 @@
 from django.contrib import messages, auth
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
+
+from carts.models import Cart, CartItem
+from carts.views import _cart_id
 from .forms import RegistrationForm
 from .models import Account
 from django.contrib.auth.decorators import login_required
@@ -12,6 +15,9 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
+
+
+import requests
 
 
 def register(request):
@@ -70,9 +76,93 @@ def login(request):
         user = auth.authenticate(email=email, password=password)
 
         if user is not None:
+            try:
+                cart = Cart.objects.get(cart_id=_cart_id(request))
+                is_cart_item_exits = CartItem.objects.filter(
+                    cart=cart).exists()
+
+                if is_cart_item_exits:
+
+                    cart_item = CartItem.objects.filter(cart=cart)
+                    is_cartItem_exits_for_given_user = CartItem.objects.filter(
+                        user=user).exists()
+
+                    if is_cartItem_exits_for_given_user:
+                        variation_item_check = list()
+                        cartItem_id = list()
+                        cart_id = CartItem.objects.filter(user=user)[0].cart
+                        cart_item_of_user = CartItem.objects.filter(
+                            cart=cart_id)
+
+                        for item in cart_item_of_user:
+                            variation_list_of_user = [item.product.pk]
+                            vary = [var for var in item.variations.all()]
+
+                            variation_list_of_user.append(vary)
+                            variation_item_check.append(variation_list_of_user)
+
+                            cartItem_id.append(item.id)
+
+                        # print("\n", item_check, "\n")
+
+                        for item in cart_item:
+                            variation_list = [item.product.pk]
+                            vary = [var for var in item.variations.all()]
+
+                            variation_list.append(vary)
+
+                            if variation_list in variation_item_check:
+
+                                # updating cartItem quantities of login user
+                                index = variation_item_check.index(
+                                    variation_list)
+                                item_id = cartItem_id[index]
+
+                                updated_item = CartItem.objects.get(id=item_id)
+
+                                updated_item.quantity += item.quantity
+                                updated_item.save()
+
+                            else:
+
+                                updated_item = CartItem.objects.create(
+                                    product=item.product, quantity=item.quantity, cart=cart_id, user=user)
+                                if len(variation_list[1]) > 0:
+                                    updated_item.variations.add(
+                                        *variation_list[1])
+
+                        cart_item.delete()
+                        cart.delete()
+
+                    else:
+                        for item in cart_item:
+                            item.user = user
+                            item.save()
+
+            except:
+                pass
+
             auth.login(request, user)
             messages.success(request, 'You are logged in.')
-            return redirect('home')
+
+            # 'http://127.0.0.1:8000/accounts/login/?next=/cart/checkout/' contain by URL
+            url = request.META.get('HTTP_REFERER')
+            print("\n", url, "\n")
+            try:
+                # 'next=/cart/checkout/' contain by query
+                query = requests.utils.urlparse(url).query
+
+                # next=/cart/checkout/
+                # 'query.split("&")' any symbol we can pass but make sure that it is not present in that query
+                params = dict(x.split('=') for x in query.split("&"))
+
+                if "next" in params:
+                    nextPage = params['next']
+                    return redirect(nextPage)
+
+            except:
+                return redirect('home')
+
         else:
             messages.error(request, "Invaild login credential.")
             return redirect('login')

@@ -10,7 +10,11 @@ class CartAdmin(admin.ModelAdmin):
 
 
 class CartItemAdmin(admin.ModelAdmin):
-    list_display = ("product", "cart", "quantity", "is_active")
+    list_display = ("product", "cart", "get_variations",
+                    "quantity", 'user', "is_active")
+
+    def get_variations(self, instance):
+        return [variation for variation in instance.variations.all()]
 
 
 admin.site.register(Cart, CartAdmin)
