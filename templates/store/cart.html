@@ -20,119 +20,144 @@
     {% else %}
     <div class="row">
         <aside class="col-lg-9">
-    <div class="card">
-    <table class="table table-borderless table-shopping-cart">
-    <thead class="text-muted">
-    <tr class="small text-uppercase">
-      <th scope="col" >Product</th>
-      <th scope="col" width="120">Quantity</th>
-      <th scope="col" width="120">Price</th>
-      <th scope="col" class="text-right" width="200"> </th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for cart_item in cart_items %}
-    <tr>
-        <td>
-            <figure class="itemside align-items-center">
-                <div class="aside">
-                    <a href="{{cart_item.product.get_url}}"><img src="{{cart_item.product.images.url}}" class="img-sm"></a>
-                </div>
-                <figcaption class="info">
-                    <a href="{{cart_item.product.get_url}}" class="title text-dark">{{cart_item.product.product_name | truncatechars:30 }}</a>
-                    <p class="text-muted small">
-                        {% if cart_item.variations.all %}
-                            {% for item in cart_item.variations.all %}
-                                {{item.variation_category}} : {{item.variation_value}} <br>
-                            {% endfor %}
-                        {% endif %}
-                    </p>
-                </figcaption>
-            </figure>
-        </td>
-        <td> 
-        <!-- col.// -->
-        <div class="col"> 
-            <div class="input-group input-spinner">
-                <!-- minus button starts -->
-               
-                <div class="input-group-prepend">
-                    <form action="{% url 'remove_cart' cart_item.id %}" method="POST">
-                        {% csrf_token %}
-                        {% for item in cart_item.variations.all %}
-                            <input type="hidden" name="{{item.variation_category | lower }}" value="{{item.variation_value | capfirst}}">
-                            
+            {% if active_address %}
+                <div class="card">
+                    <div class="card-body">
+                        <div class="dropdown float-md-right">
+                            <a href="#" class="btn btn btn-outline-primary" type="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Change</a>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                {% for address_ in address %}
+                                    <li class="mx-4 my-2 border">
+                                        <a class="dropdown-item" href="{% url 'billing_address' address_.id %}">
+                                            <p class="card-text mb-1 mt-2"><b>{{address_.full_name | title}},&nbsp;{{address_.pin_code}}</b></p>
+                                            <p class="card-text mb-2">{{address_.full_address}}</p>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                          </div>
+                            <!-- The Modal end -->
+                        <p class="card-text mb-1 mt-2">Deliver to:  <b>{{active_address.full_name | title}},&nbsp;{{active_address.pin_code}}</b></p>
+                        <p class="card-text mb-0">{{active_address.full_address}}</p>
+                        <p class="card-text ">{{active_address.state}},&nbsp; Phone: {{active_address.phone}}</p>
+
+                        
+                    </div>
+                </div> <!-- card.// -->
+            {% endif %}
+            <div class="card">
+                <table class="table table-borderless table-shopping-cart">
+                    <thead class="text-muted">
+                        <tr class="small text-uppercase">
+                            <th scope="col" >Product</th>
+                            <th scope="col" width="120">Quantity</th>
+                            <th scope="col" width="120">Price</th>
+                            <th scope="col" class="text-right" width="200"> </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cart_item in cart_items %}
+                        <tr>
+                            <td>
+                                <figure class="itemside align-items-center">
+                                    <div class="aside">
+                                        <a href="{{cart_item.product.get_url}}"><img src="{{cart_item.product.images.url}}" class="img-sm"></a>
+                                    </div>
+                                    <figcaption class="info">
+                                        <a href="{{cart_item.product.get_url}}" class="title text-dark">{{cart_item.product.product_name | truncatechars:30 }}</a>
+                                        <p class="text-muted small">
+                                            {% if cart_item.variations.all %}
+                                                {% for item in cart_item.variations.all %}
+                                                    {{item.variation_category}} : {{item.variation_value}} <br>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </p>
+                                    </figcaption>
+                                </figure>
+                            </td>
+                            <td> 
+                                <!-- col.// -->
+                                <div class="col"> 
+                                    <div class="input-group input-spinner">
+                                        <!-- minus button starts -->
+                                    
+                                        <div class="input-group-prepend">
+                                            <form action="{% url 'remove_cart' cart_item.id %}" method="POST">
+                                                {% csrf_token %}
+                                                {% for item in cart_item.variations.all %}
+                                                    <input type="hidden" name="{{item.variation_category | lower }}" value="{{item.variation_value | capfirst}}">
+                                                    
+                                                {% endfor %}
+                                                <button class="btn btn-light" type="submit" id="button-minus"> <i class="fa fa-minus"></i> </button>
+                                            </form>
+                                        </div>
+                                        <!-- minus button ends -->
+
+
+                                        
+
+                                        <input type="text" class="form-control" name="item_quantity" value="{{cart_item.quantity}}">
+
+                                        <!-- plus button starts -->
+
+                                        <div class="input-group-append">
+                                            <form action="{% url 'add_cart' cart_item.product.id %}" method="POST">
+                                                {% csrf_token %}
+                                                {% for item in cart_item.variations.all %}
+                                                    <input type="hidden" name="{{item.variation_category | lower }}" value="{{item.variation_value | capfirst}}">
+                                                    
+                                                {% endfor %}
+                                                <button class="btn btn-light" type="submit" id="button-plus"> <i class="fa fa-plus"></i> </button>
+                                            </form>
+                                        </div>
+                                        
+                                    </div> <!-- input-group.// -->
+                                        <!-- plus button ends -->
+                                </div> <!-- col.// -->
+                            </td>
+                            <td> 
+                                <div class="price-wrap"> 
+                                    <var class="price">{{cart_item.subTotal}}</var> 
+                                    <small class="text-muted">  $ {{cart_item.product.price}} each </small> 
+                                </div> <!-- price-wrap .// -->
+                            </td>
+                            <td class="text-right"> 
+                                <a href="{% url 'remove_cart_items' cart_item.id %}" onclick="return confirm('Are you sure to delete this item?')" class="btn btn-danger"> Remove</a>
+                            </td>
+                        </tr>
                         {% endfor %}
-                        <button class="btn btn-light" type="submit" id="button-minus"> <i class="fa fa-minus"></i> </button>
-                    </form>
-                </div>
-                <!-- minus button ends -->
-
-
-                
-
-                <input type="text" class="form-control" name="item_quantity" value="{{cart_item.quantity}}">
-
-                <!-- plus button starts -->
-
-                <div class="input-group-append">
-                    <form action="{% url 'add_cart' cart_item.product.id %}" method="POST">
-                        {% csrf_token %}
-                        {% for item in cart_item.variations.all %}
-                            <input type="hidden" name="{{item.variation_category | lower }}" value="{{item.variation_value | capfirst}}">
-                            
-                        {% endfor %}
-                        <button class="btn btn-light" type="submit" id="button-plus"> <i class="fa fa-plus"></i> </button>
-                    </form>
-                </div>
-                
-                </div> <!-- input-group.// -->
-                <!-- plus button ends -->
-        </div> <!-- col.// -->
-        </td>
-        <td> 
-            <div class="price-wrap"> 
-                <var class="price">{{cart_item.subTotal}}</var> 
-                <small class="text-muted">  $ {{cart_item.product.price}} each </small> 
-            </div> <!-- price-wrap .// -->
-        </td>
-        <td class="text-right"> 
-        <a href="{% url 'remove_cart_items' cart_item.id %}" onclick="return confirm('Are you sure to delete this item?')" class="btn btn-danger"> Remove</a>
-        </td>
-    </tr>
-    {% endfor %}
-    </tbody>
-    </table>
-    </div> <!-- card.// -->
-    
-    </aside> <!-- col.// -->
+                    </tbody>
+                </table>
+            </div> <!-- card.// -->
+        
+        </aside> <!-- col.// -->
         <aside class="col-lg-3">
     
             <div class="card">
-            <div class="card-body">
-                <dl class="dlist-align">
-                  <dt>Total price:</dt>
-                  <dd class="text-right">${{total}}</dd>
-                </dl>
-                <dl class="dlist-align">
-                  <dt>Tax:</dt>
-                  <dd class="text-right"> ${{tax}}</dd>
-                </dl>
-                <dl class="dlist-align">
-                  <dt>Grand Total:</dt>
-                  <dd class="text-right text-dark b"><strong>${{grand_total}}</strong></dd>
-                </dl>
-                <hr>
-                <p class="text-center mb-3">
-                    <img src="{% static './images/misc/payments.png' %}" height="26">
-                </p>
-                <a href="{% url 'checkout' %}" class="btn btn-primary btn-block"> Checkout </a>
-                <a href="{% url 'store' %}" class="btn btn-light btn-block">Continue Shopping</a>
-            </div> <!-- card-body.// -->
+                <div class="card-body">
+                    <dl class="dlist-align">
+                        <dt>Total price:</dt>
+                        <dd class="text-right">${{total}}</dd>
+                    </dl>
+                    <dl class="dlist-align">
+                        <dt>Tax:</dt>
+                        <dd class="text-right"> ${{tax}}</dd>
+                    </dl>
+                    <dl class="dlist-align">
+                        <dt>Grand Total:</dt>
+                        <dd class="text-right text-dark b"><strong>${{grand_total}}</strong></dd>
+                    </dl>
+                    <hr>
+                    <p class="text-center mb-3">
+                        <img src="{% static './images/misc/payments.png' %}" height="26">
+                    </p>
+                    <a href="{% url 'checkout' %}" class="btn btn-primary btn-block"> Checkout </a>
+                    <a href="{% url 'store' %}" class="btn btn-light btn-block">Continue Shopping</a>
+                </div> <!-- card-body.// -->
             </div> <!-- card.// -->
     
-    </aside> <!-- col.// -->
-    
+        </aside> <!-- col.// -->
+        
     
     </div> <!-- row.// -->
     <!-- ============================ COMPONENT 1 END .// ================================= -->

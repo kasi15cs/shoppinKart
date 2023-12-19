@@ -13,4 +13,7 @@ urlpatterns = [
 
     path('checkout/', views.checkout, name='checkout'),
 
+    path('billing_address/<int:billing_address_id>/',
+         views.billing_address, name='billing_address'),
+
 ]

@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'accounts',
     'store',
     'carts',
+    'orders',
+    'address',
 ]
 
 MIDDLEWARE = [
@@ -150,3 +152,18 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = my['EMAIL']
 EMAIL_HOST_PASSWORD = 'cnqm imwr htlu csbr'  # my['E_PASSWORD']
 EMAIL_USE_TLS = True
+
+
+###################################################################
+
+RAZORPAY_KEY_ID = 'rzp_test_jHJeey4Tf0AHU9'
+RAZORPAY_KEY_SECRET = 'gJZZpO3Wowq5LoNTVAsgqvtq'
+
+####################################################
+
+# where cash is paid into
+# PAYPAL_RECEIVER_EMAIL = 'shoppingkart.bussinesssandbox@gmail.com'
+PAYPAL_CLIENT_ID = 'AcFyOuZci8FPQO4aBiNjcBfL-XYe6V04jnRASwMNpQb7koexvcD4Vew1JDTY07iaI4FNGPByDmHoxHiW'
+PAYPAL_SECRET = 'EIeSTVJ02AobWwXDKH0O7izZHedBi_MVUZKwI8HKX9ujmKwLkIvxcjTrJKzLf44L-REjzB5cA3jMW3E0'
+PAYPAL_TEST = True
+#

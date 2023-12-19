@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<section class="section-content padding-y bg">
+    <div class="container">
+        
+        <!-- ============================ COMPONENT 1. ================================= -->
+        <div class="row">
+            <aside class="col-lg-10">
+                <div class="card">
+                    <div class="card-body">
+                    <p class="card-text"><a href="{% url 'add_address' %}"><i class="fa fa-plus"> </i> <b>&nbsp;&nbsp;ADD A NEW ADDRESS</b></a></p>
+                    </div>
+                </div>
+                {% for address_ in address %}
+                <div class="card">
+                    
+                    <div class="card-body">
+                        <div class="dropdown dropleft float-md-right">
+                            <a href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-v" ></i></a>
+                            <div class="dropdown-menu dropdown-menu-left" aria-labelledby="dropdownMenuLink">
+                              <a class="dropdown-item" href="{% url 'edit_address' address_.id %}">Edit</a>
+                              <a class="dropdown-item" href="{% url 'delete_address' address_.id %}">Delete</a>
+                            </div>
+                        </div>
+                        <p class="card-text mb-1 mt-0"><b>{{address_.full_name | title}},&nbsp;&nbsp;&nbsp;&nbsp;{{address_.phone}}</b></p>
+                        <p class="card-text mb-1 mt-0">{{address_.full_address}}</p>
+                        <p class="card-text mt-0">{{address_.state}}- {{address_.pin_code}}</p>
+
+                        
+                    </div>
+                </div>
+                {% endfor %}
+                
+            </aside>
+
+        </div> <!-- row.// -->
+            
+        <!-- ============================ COMPONENT 1 END .// ================================= -->
+    
+    </div> <!-- container .//  -->
+</section>
+    <!-- ========================= SECTION CONTENT END// ========================= -->
+    
+{% endblock %}

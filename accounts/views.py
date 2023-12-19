@@ -147,7 +147,6 @@ def login(request):
 
             # 'http://127.0.0.1:8000/accounts/login/?next=/cart/checkout/' contain by URL
             url = request.META.get('HTTP_REFERER')
-            print("\n", url, "\n")
             try:
                 # 'next=/cart/checkout/' contain by query
                 query = requests.utils.urlparse(url).query
