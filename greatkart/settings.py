@@ -9,10 +9,16 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
-from django.contrib.messages import constants as messages
-from pathlib import Path
+from decouple import config
 from os import environ as my
+from pathlib import Path
+from django.contrib.messages import constants as messages
+
+
+# honeypot configuration
+import django
+from django.utils.translation import gettext
+django.utils.translation.ugettext = gettext
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,10 +28,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-fexhg@2fp&abg^y4)3exkz-lvnjx8@^8hywaj60+#2ql3h=%0^'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = []
 
@@ -45,6 +51,7 @@ INSTALLED_APPS = [
     'carts',
     'orders',
     'address',
+    'admin_honeypot',
 ]
 
 MIDDLEWARE = [
@@ -55,7 +62,14 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_session_timeout.middleware.SessionTimeoutMiddleware',
 ]
+
+
+# django-session-timeout
+SESSION_EXPIRE_SECONDS = 3600  # 1 hour
+SESSION_EXPIRE_AFTER_LAST_ACTIVITY = True
+SESSION_TIMEOUT_REDIRECT = 'accounts/login'
 
 ROOT_URLCONF = 'greatkart.urls'
 
@@ -147,23 +161,26 @@ MESSAGE_TAGS = {
 }
 
 # SMTP CONFIGURATION
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = my['EMAIL']
-EMAIL_HOST_PASSWORD = 'cnqm imwr htlu csbr'  # my['E_PASSWORD']
-EMAIL_USE_TLS = True
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT', cast=int)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')  # my['E_PASSWORD']
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
 
 
 ###################################################################
 
-RAZORPAY_KEY_ID = 'rzp_test_jHJeey4Tf0AHU9'
-RAZORPAY_KEY_SECRET = 'gJZZpO3Wowq5LoNTVAsgqvtq'
+RAZORPAY_KEY_ID = config('RAZORPAY_KEY_ID')
+RAZORPAY_KEY_SECRET = config('RAZORPAY_KEY_SECRET')
 
 ####################################################
 
 # where cash is paid into
 # PAYPAL_RECEIVER_EMAIL = 'shoppingkart.bussinesssandbox@gmail.com'
-PAYPAL_CLIENT_ID = 'AcFyOuZci8FPQO4aBiNjcBfL-XYe6V04jnRASwMNpQb7koexvcD4Vew1JDTY07iaI4FNGPByDmHoxHiW'
-PAYPAL_SECRET = 'EIeSTVJ02AobWwXDKH0O7izZHedBi_MVUZKwI8HKX9ujmKwLkIvxcjTrJKzLf44L-REjzB5cA3jMW3E0'
-PAYPAL_TEST = True
+PAYPAL_CLIENT_ID = config('PAYPAL_CLIENT_ID')
+PAYPAL_SECRET = config('PAYPAL_SECRET')
+PAYPAL_TEST = config('PAYPAL_TEST', default=True, cast=bool)
 #
+
+# to remove warnings
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'

@@ -9,6 +9,7 @@ class Category(models.Model):
     category_name = models.CharField(max_length=50)
     slug = models.SlugField(max_length=100, unique=True)
     description = models.TextField(max_length=255)
+    cat_discount = models.IntegerField(default=0)
     cat_image = models.ImageField(upload_to='photos/categories', blank=True)
 
     class Meta:
@@ -20,4 +21,3 @@ class Category(models.Model):
 
     def __str__(self):
         return self.category_name
-    

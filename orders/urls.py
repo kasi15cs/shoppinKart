@@ -11,4 +11,7 @@ urlpatterns = [
     path('payment_failed/', views.payment_failed, name='payment_failed'),
     path('order_completed/', views.order_completed, name='order_completed'),
 
+    path('order_successful', views.order_successful, name='order_successful'),
+
+
 ]

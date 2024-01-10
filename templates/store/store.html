@@ -155,12 +155,33 @@
 			<figcaption class="info-wrap">
 
 				<a href="{{product.get_url}}" class="img-wrap"> <img src="{{ product.images.url }}"> </a><!-- ./product-detail.html && img-wrap.// --> 
-				<div class="fix-height">
-					<a href="{{product.get_url}}" class="title m-2">{{product.product_name | truncatechars:35}}</a> <!--./product-detail.html-->
-					<div class="price-wrap mt-2">
-						<span class="price m-2 ">${{product.price}}</span> <!-- <del class="price-old">$1980</del> -->
+				<div>
+					<a href="{{product.get_url}}" class="title">{{product.product_name | truncatechars:25}}</a> <!--./product-detail.html-->
+					{%if product.reviewCount %}
+					<div class="rating-star">
+						<span>
+						<span class="text-muted">{{product.averageReview}}</span> 
+						<i class="fa fa-star{% if product.averageReview == 0.5 %}-half-o{% elif product.averageReview < 1 %}-o {% endif %}" aria-hidden="true"></i>
+						<i class="fa fa-star{% if product.averageReview == 1.5 %}-half-o{% elif product.averageReview < 2 %}-o {% endif %}" aria-hidden="true"></i>
+						<i class="fa fa-star{% if product.averageReview == 2.5 %}-half-o{% elif product.averageReview < 3 %}-o {% endif %}" aria-hidden="true"></i>
+						<i class="fa fa-star{% if product.averageReview == 3.5 %}-half-o{% elif product.averageReview < 4 %}-o {% endif %}" aria-hidden="true"></i>
+						<i class="fa fa-star{% if product.averageReview == 4.5 %}-half-o{% elif product.averageReview < 5 %}-o {% endif %}" aria-hidden="true"></i>
 						
+						</span>
+						<!-- <span class="text-muted mx-2">{{product.reviewCount}} Reviews</span> -->
+					</div>
+				{% endif %}
+				<div>
+					<div class="price mt-1">$ {{product.price}} 
+						{% if product.discount %}
+							
+							<s class=" text-muted ml-2"><i>$ {{product.withoutDiscount}}</i></s>
+							<i class="text-success ml-1">{{product.discount}}%off</i>
+
+						{% endif %}
 					</div> <!-- price-wrap.// -->
+					
+				</div> <!-- price-wrap.// -->
 				</div>
 				
 				<a href="{{product.get_url}}" class="btn  btn-primary btn-block mt-2"> <span class="text">View Details </span></a>
@@ -178,20 +199,22 @@
 	</div>
 
 	{% endif %}
-    
-	
+
+
 </div> <!-- row end.// -->
 
 
 <nav class="mt-4" aria-label="Page navigation sample">
 	{% if products.has_other_pages	 %}
 		<ul class="pagination">
+			<!-- Previous button in pagination -->
 			{% if products.has_previous %}
 				<li class="page-item active"><a class="page-link" href="?page={{ products.previous_page_number }}">Previous</a></li>
 			{% else %}
 				<li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
 			{% endif %}
-	
+			
+		<!-- page_number buttons in pagination -->
 		{% for i in products.paginator.page_range %}
 			{% if products.number == i %}
 				<li class="page-item active"><a class="page-link" href="#">{{i}}</a></li>
@@ -200,6 +223,7 @@
 			{% endif %}
 		{% endfor %}
 
+		<!-- Next button in pagination -->
 		{% if products.has_next %}
 			<li class="page-item active"><a class="page-link" href="?page={{products.next_page_number}}">Next</a></li>
 		{% else %}

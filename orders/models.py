@@ -22,7 +22,7 @@ class Order(models.Model):
         ('New', 'New'),
         ('Accepted', 'Accepted'),
         ('Completed', 'Completed'),
-        ('Cancelled', 'Cancelled'),
+        ('Failed', 'Failed'),
     )
 
     user = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True)
@@ -42,7 +42,7 @@ class Order(models.Model):
     city = models.CharField(max_length=50, null=True)
     state = models.CharField(max_length=50, null=True)
     country = models.CharField(max_length=50, default='India')
-    order_note = models.CharField(max_length=100, blank=True)
+    order_note = models.CharField(max_length=100, blank=True, null=True)
     order_total = models.FloatField()
     tax = models.FloatField()
     status = models.CharField(max_length=10, choices=STATUS, default='New')

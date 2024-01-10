@@ -22,6 +22,16 @@ class CartItem(models.Model):
     quantity = models.IntegerField()
     is_active = models.BooleanField(default=True)
 
+    def ProductCount(self):
+        productCount = 0
+        cart_items = CartItem.objects.filter(product=self.product)
+
+        for cart_item in cart_items:
+            productCount += cart_item.quantity
+
+        return productCount
+    
+
     def subTotal(self):
         return self.product.price * self.quantity
 

@@ -3,11 +3,13 @@
 {% block content %}
 
 <section class="section-content padding-y bg">
+    {% include "includes/alerts.html" %}
     <div class="container">
         
         <!-- ============================ COMPONENT 1. ================================= -->
         <div class="row">
-            <aside class="col-lg-10">
+            {% include "includes/dashboard_sidebar.html"%}
+            <aside class="col-md-9">
                 <div class="card">
                     <div class="card-body">
                     <p class="card-text"><a href="{% url 'add_address' %}"><i class="fa fa-plus"> </i> <b>&nbsp;&nbsp;ADD A NEW ADDRESS</b></a></p>

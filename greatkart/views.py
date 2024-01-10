@@ -1,12 +1,19 @@
 from carts.models import Cart, CartItem
-from store.models import Product
+from store.models import Product, ReviewRating
 
 from django.shortcuts import render
 
 
-def home(request, cart_quantities=0):
-    product = Product.objects.all().filter(is_available=True)
+def home(request):
+    products = Product.objects.all().filter(
+        is_available=True).order_by('-modified_date')
+
+    for product in products:
+        reviews = ReviewRating.objects.filter(
+            product_id=product.id, status=True)
+
     context = {
-        'products': product,
+        'products': products,
+        'reviews': reviews,
     }
     return render(request, 'home.html', context)

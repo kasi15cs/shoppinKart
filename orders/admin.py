@@ -22,7 +22,7 @@ class OrderAdmin(admin.ModelAdmin):
     readonly_fields = ('updated_at',)
 
     search_fields = ['user__email', 'first_name', 'last_name', 'phone', 'email',
-                     'city', 'state', 'pin_code',]
+                     'city', 'state', 'pin_code', 'order_number']
 
     list_filter = ("is_ordered", 'status')
     list_per_page = 20

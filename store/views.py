@@ -13,16 +13,10 @@ from orders.models import OrderProduct
 
 from .forms import ReviewForm
 
-from .models import Product, ReviewRating
+from .models import Product, ProductGallery, ReviewRating
 
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.contrib.auth.decorators import login_required
-
-from statistics import mean
-from math import floor, ceil
-
-
-# Create your views here.
 
 
 def store(request, category_slug=None):
@@ -70,32 +64,31 @@ def product_detail(request, category_slug, product_slug):
         raise e
 
     if current_user.is_authenticated:
-        orderproduct_check = OrderProduct.objects.filter(
-            user=request.user, product=single_product).exists()
+        try:
+            orderproduct_check = OrderProduct.objects.filter(
+                user=request.user, product=single_product).exists()
+        except OrderProduct.DoesNotExist:
+            orderproduct_check = None
     else:
         orderproduct_check = None
 
     # Get all reviews regarding this product
+    reviews_list = ReviewRating.objects.filter(
+        product=single_product, status=True).order_by("-updated_at")
 
-    reviews = ReviewRating.objects.filter(product=single_product, status=True)
+    current_user_review = ReviewRating.objects.filter(
+        user=current_user, product=single_product, status=True).exists()
 
-    # Average of review-rating
-    avg_rating = mean([rv.rating for rv in reviews])
-    floor_avg_rating = floor(avg_rating)
-    ceil_avg_rating = ceil(avg_rating)
-
-    if avg_rating > (floor_avg_rating+0.5) and avg_rating < ceil_avg_rating:
-        avg_rating = float(floor_avg_rating+0.5)
-    elif avg_rating > (floor_avg_rating) and avg_rating < (floor_avg_rating + 0.5):
-        avg_rating = float(floor_avg_rating)
+    product_gallery = ProductGallery.objects.filter(
+        product_id=single_product.id)
 
     context = {
         'single_product': single_product,
         'in_cart': in_cart,
-        'reviews': reviews,
+        'reviews_list': reviews_list,
         'orderproduct_check': orderproduct_check,
-        'avg_rating': avg_rating,
-        'rating': len(reviews),
+        'product_gallery': product_gallery,
+        'current_user_review': current_user_review,
     }
 
     return render(request, 'store/product_detail.html', context)

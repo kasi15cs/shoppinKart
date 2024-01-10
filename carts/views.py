@@ -10,6 +10,11 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from django.contrib.auth.decorators import login_required
 
+# settings of django project file
+from django.conf import settings
+# Razorpay
+import razorpay
+
 
 def _cart_id(request):
     cart = request.session.session_key
@@ -73,7 +78,8 @@ def add_cart(request, product_id):
                 index = ex_var_list.index(product_variation)
                 item_id = id[index]
                 item = CartItem.objects.get(id=item_id)
-                item.quantity += 1
+                if item.product.stock > item.quantity:
+                    item.quantity += 1
                 # item.save()
             else:
                 item = CartItem.objects.create(
@@ -218,6 +224,8 @@ def remove_cart_items(request, cart_item_id):
 def cart(request, total=0, tax=0, grand_total=0, quantity=0, cart_items=None):
     address = None
     active_address = None
+    total_discount = 0
+    fake_total = 0
 
     try:
         if request.user.is_authenticated:
@@ -233,10 +241,16 @@ def cart(request, total=0, tax=0, grand_total=0, quantity=0, cart_items=None):
             cart_items = CartItem.objects.filter(cart=cart, is_active=True)
 
         for cart_item in cart_items:
-            total += (cart_item.product.price * cart_item.quantity)
+            subtotal = (cart_item.product.price * cart_item.quantity)
+            total += subtotal
             quantity += cart_item.quantity
+            discount = cart_item.product.discount
+            total_discount += round((subtotal*(discount/(100-discount))))
+
         tax = (2*total)/100
+        fake_total = total_discount + total
         grand_total = total + tax
+
     except ObjectDoesNotExist:
         pass
     context = {
@@ -244,6 +258,8 @@ def cart(request, total=0, tax=0, grand_total=0, quantity=0, cart_items=None):
         'quantity': quantity,
         'cart_items': cart_items,
         'tax': tax,
+        'fake_total': fake_total,
+        'total_discount': total_discount,
         'grand_total': grand_total,
         'address': address,
         'active_address': active_address,
@@ -257,6 +273,7 @@ def cart(request, total=0, tax=0, grand_total=0, quantity=0, cart_items=None):
 def checkout(request, total=0, quantity=0, cart_items=None):
     current_user = request.user
     default_address = None
+    total_discount = 0
     address = None
     try:
         tax = 0
@@ -274,22 +291,37 @@ def checkout(request, total=0, quantity=0, cart_items=None):
             return redirect("store")
 
         for cart_item in cart_items:
-            total += (cart_item.product.price * cart_item.quantity)
+            subtotal = (cart_item.product.price * cart_item.quantity)
+            total += subtotal
             quantity += cart_item.quantity
+            discount = cart_item.product.discount
+            total_discount += round(subtotal*(discount/(100-discount)))
 
         tax = (2*total)/100
+        fake_total = total_discount + total
         grand_total = total + tax
 
     except ObjectDoesNotExist:
         pass
+
+    # creating razorpay client
+    client = razorpay.Client(
+        auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+
+    payment = client.order.create(
+        {'amount': grand_total*100, 'currency': 'INR', 'payment_capture': 1})
+
     context = {
         'total': total,
         'quantity': quantity,
         'cart_items': cart_items,
         'tax': tax,
+        'total_discount': total_discount,
+        'fake_total': fake_total,
         'grand_total': grand_total,
         'default_address': default_address,
         'address': address,
+        'payment': payment,
 
     }
     return render(request, 'orders/checkout.html', context)

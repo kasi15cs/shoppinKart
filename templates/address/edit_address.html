@@ -3,76 +3,81 @@
 {% block content %}
 
 <section class="section-content padding-y bg">
-    
+    {% include "includes/alerts.html" %}
+    <div class="container">
         
-    <!-- ============================ COMPONENT 1. ================================= -->
-        <form action="{% url 'edit_address' address.id %}" method="POST">
-            {% csrf_token %}
-            
-                <div class="card mx-auto" style="max-width:720px; margin-top:40px;">
-                    <div class="card-body">
-                        <h4 class="card-title mb-4 p-2">ADD A NEW ADDRESS</h4>
-                        
-                            <div class="form-row">
-                                <div class="col form-group">
-                                    <label for="">First Name</label>
-                                    <input type="text" name="first_name" class="form-control" value="{{address.first_name | title}}">
-                                </div>
-                                <div class="col form-group">
-                                    <label for="">Last Name</label>
-                                    <input type="text" name="last_name" class="form-control" value="{{address.last_name | title}}">
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="col form-group">
-                                    <label for="">Email</label>
-                                    <input type="email" name="email" class="form-control" value="{{address.email}}">
-                                </div>
-                                <div class="col form-group">
-                                    <label for="">Phone Number</label>
-                                    <input type="text" name="phone" class="form-control" value="{{address.phone}}">
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="col form-group">
-                                    <label for="">Address Line 1</label>
-                                    <input type="text" name="address_line_1" class="form-control" value="{{address.address_line_1}}">
-                                </div>
-                                <div class="col form-group">
-                                    <label for="">Address Line2</label>
-                                    <input type="text" name="address_line_2" class="form-control" value="{{address.address_line_2}}">
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="col form-group">
-                                    <label for="">City</label>
-                                    <input type="text" name="city" class="form-control" value="{{address.city | capfirst}}">
-                                </div>
-                                <div class="col form-group">
-                                    <label for="">State</label>
-                                    <input type="text" name="state" class="form-control" value="{{address.state | capfirst}}">
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="col form-group">
-                                    <label for="">Pin Code</label>
-                                    <input type="text" name="pin_code" class="form-control" value="{{address.pin_code}}">
-                                </div>
-                                <div class="col form-group">
-                                    <label for="">Country</label>
-                                    <input type="text" name="country" class="form-control" value="{{address.country | capfirst}}">
-                                </div>
-                            </div>
+        <!-- ============================ COMPONENT 1. ================================= -->
+        <div class="row">
+            {% include "includes/dashboard_sidebar.html"%}
+            <aside class="col-md-8">
+                <form action="{% url 'edit_address' address.id %}" method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="card mx-auto" >
+                        <div class="card-body">
+                            <h4 class="card-title mb-4 p-2">Edit Address</h4>
                             
-                            <div class="form-row">
-                                <button class="btn btn-primary btn-block mt-4 pt-3" type="submit" name="submit"><h5>Save</h5></button>
-                            </div>
-                    </div>
-            
-                </div> <!-- card.// -->
-            
-        </form>
-        
+                                <div class="form-row">
+                                    <div class="col form-group">
+                                        <label for="">First Name</label>
+                                        <input type="text" name="first_name" class="form-control" value="{{address.first_name | title}}">
+                                    </div>
+                                    <div class="col form-group">
+                                        <label for="">Last Name</label>
+                                        <input type="text" name="last_name" class="form-control" value="{{address.last_name | title}}">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col form-group">
+                                        <label for="">Email</label>
+                                        <input type="email" name="email" class="form-control" value="{{address.email}}">
+                                    </div>
+                                    <div class="col form-group">
+                                        <label for="">Phone Number</label>
+                                        <input type="text" name="phone" class="form-control" value="{{address.phone}}">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col form-group">
+                                        <label for="">Address Line 1</label>
+                                        <input type="text" name="address_line_1" class="form-control" value="{{address.address_line_1}}">
+                                    </div>
+                                    <div class="col form-group">
+                                        <label for="">Address Line2</label>
+                                        <input type="text" name="address_line_2" class="form-control" value="{{address.address_line_2}}">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col form-group">
+                                        <label for="">City</label>
+                                        <input type="text" name="city" class="form-control" value="{{address.city | capfirst}}">
+                                    </div>
+                                    <div class="col form-group">
+                                        <label for="">State</label>
+                                        <input type="text" name="state" class="form-control" value="{{address.state | capfirst}}">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col form-group">
+                                        <label for="">Pin Code</label>
+                                        <input type="text" name="pin_code" class="form-control" value="{{address.pin_code}}">
+                                    </div>
+                                    <div class="col form-group">
+                                        <label for="">Country</label>
+                                        <input type="text" name="country" class="form-control" value="{{address.country | capfirst}}">
+                                    </div>
+                                </div>
+                                
+                                <input class="btn btn-primary"  type="submit" name="submit" value="Update" style="float: right;">
+
+                        </div>
+                
+                    </div> <!-- card.// -->
+                    
+                </form>
+            </aside>    
+        </div>
+    </div>
     <!-- ============================ COMPONENT 1 END .// ================================= -->
  
 </section>

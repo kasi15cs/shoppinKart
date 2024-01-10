@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
+from django.contrib import messages
 
 from .forms import AddressForm
 
@@ -35,7 +36,7 @@ def delete_address(request, address_id):
                     break
 
         address.delete()
-
+        messages.success(request, "Your address has been deleted.")
     return redirect('manage_address')
 
 
@@ -68,9 +69,11 @@ def add_address(request):
                 else:
                     address.is_active = True
                     address.save()
+            messages.success(request, "Your new address has been added.")
             return redirect('manage_address')
 
         else:
+
             return render(request, 'address/add_address.html')
 
 
@@ -96,6 +99,8 @@ def edit_address(request, address_id):
                 address.city = form.cleaned_data['city']
                 address.pin_code = form.cleaned_data['pin_code']
                 address.save()
+            messages.success(request, "Your address has been Updated.")
+
             return redirect('manage_address')
 
         else:

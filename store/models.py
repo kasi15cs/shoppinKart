@@ -1,3 +1,4 @@
+from math import ceil, floor
 from django.db import models
 from django.urls import reverse
 from accounts.models import Account
@@ -16,9 +17,37 @@ class Product(models.Model):
     images = models.ImageField(upload_to='photos/products')
     stock = models.IntegerField()
     is_available = models.BooleanField(default=True)
+    discount = models.IntegerField(default=0)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
+
+    def averageReview(self):
+        reviews = ReviewRating.objects.filter(
+            product=self, status=True).aggregate(average=Avg('rating'))
+        avg_rating = 0
+        if reviews['average'] is not None:
+            avg_rating = float(reviews["average"])
+            floor_avg_rating = floor(avg_rating)
+            ceil_avg_rating = ceil(avg_rating)
+
+            if avg_rating > (floor_avg_rating+0.5) and avg_rating < ceil_avg_rating:
+                avg_rating = float(floor_avg_rating+0.5)
+            elif avg_rating > (floor_avg_rating) and avg_rating < (floor_avg_rating + 0.5):
+                avg_rating = float(floor_avg_rating)
+
+        return avg_rating
+
+    def withoutDiscount(self):
+        price = 0
+        if self.is_available:
+            price = int(self.price * (100/(100-self.discount)))
+        return price
+
+    def reviewCount(self):
+        reviews_count = ReviewRating.objects.filter(
+            product=self, status=True).count()
+        return reviews_count
 
     def __str__(self) -> str:
         return self.slug
@@ -73,13 +102,19 @@ class ReviewRating(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def averageReview(self):
-        reviews = ReviewRating.objects.filter(
-            product=self, status=True).aggregate(average=Avg('rating'))
-        avg = 0
-        if reviews['average'] is not None:
-            avg = float(reviews["average"])
-        return avg
-
     def __str__(self):
         return self.subject
+
+
+# Products gallery
+class ProductGallery(models.Model):
+    product = models.ForeignKey(
+        Product, default=None, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='store/products', max_length=255)
+
+    def __str__(self):
+        return self.product.product_name
+
+    class Meta:
+        verbose_name = 'productgallery'
+        verbose_name_plural = "product gallery"
