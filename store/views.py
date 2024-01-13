@@ -77,7 +77,7 @@ def product_detail(request, category_slug, product_slug):
         product=single_product, status=True).order_by("-updated_at")
 
     current_user_review = ReviewRating.objects.filter(
-        user=current_user, product=single_product, status=True).exists()
+        user=request.user.id, product=single_product, status=True).exists()
 
     product_gallery = ProductGallery.objects.filter(
         product_id=single_product.id)
